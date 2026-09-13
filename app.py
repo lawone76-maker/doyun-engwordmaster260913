@@ -3,21 +3,27 @@ import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
 
-# 1. 페이지 기본 설정 (상단 여백 완전 제거 CSS)
+# 1. 페이지 기본 설정 (상단 여백 완전 제거 CSS 및 버튼 스타일 적용)
 st.set_page_config(page_title="도윤 영어단어 암기장", layout="wide")
 
-# 상단 여백 확보 CSS (Deploy 버튼 밑으로 밀기)
 st.markdown("""
     <style>
+        /* 상단 헤더 숨기기 */
+        header[data-testid="stHeader"] {
+            display: none !important;
+        }
         .block-container {
-            padding-top: 4rem !important;
+            padding-top: 1rem !important;
             padding-bottom: 0.5rem !important;
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
-        /* iframe 간격 최소화 */
         iframe {
-            margin-bottom: -10px !important;
+            margin-bottom: -5px !important;
+        }
+        /* 암기 완료 버튼 커스텀 스타일 */
+        .stButton>button {
+            border-radius: 8px;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -31,6 +37,8 @@ if "current_index" not in st.session_state:
     st.session_state.current_index = 0
 if "selected_round" not in st.session_state:
     st.session_state.selected_round = "전체 보기"
+if "memorized_words" not in st.session_state:
+    st.session_state.memorized_words = set() # 암기 완료되어 제외될 단어 집합
 
 # 데이터 파싱 함수 (| 구분자 기준)
 def parse_and_load_data(file_content):
@@ -66,10 +74,9 @@ def parse_and_load_data(file_content):
                 added_count += 1
     return added_count
 
-# 3D Flip 카드 HTML 템플릿 (10열 배치용 컴팩트 사이즈)
+# 3D Flip 카드 HTML 템플릿
 def generate_card_html(card, is_mini=False):
     if is_mini:
-        # 가로 10개 전용 초미니 템플릿
         return f"""
         <!DOCTYPE html>
         <html>
@@ -128,7 +135,6 @@ def generate_card_html(card, is_mini=False):
         <body>
         <div class="flip-card" id="card_{card['id']}">
             <div class="flip-card-inner">
-                <!-- 앞면 -->
                 <div class="flip-card-front">
                     <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
                         <span>#{card['id']}</span>
@@ -139,7 +145,6 @@ def generate_card_html(card, is_mini=False):
                     </div>
                     <div style="font-size: 7px; color: #475569; text-align: right;">click 🔄</div>
                 </div>
-                <!-- 뒷면 -->
                 <div class="flip-card-back">
                     <div style="font-size: 9px; color: #a5b4fc; font-weight: bold; border-bottom: 1px solid #312e81; padding-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['word']}</div>
                     <div style="margin: auto 0; overflow: hidden;">
@@ -159,7 +164,6 @@ def generate_card_html(card, is_mini=False):
         </html>
         """
     else:
-        # 일반 개별 학습 카드
         return f"""
         <!DOCTYPE html>
         <html>
@@ -177,7 +181,7 @@ def generate_card_html(card, is_mini=False):
         .flip-card {{
             background-color: transparent;
             width: 560px;
-            height: 320px;
+            height: 300px;
             perspective: 1000px;
             cursor: pointer;
         }}
@@ -290,6 +294,18 @@ if selected_round_choice != st.session_state.selected_round:
     st.session_state.current_index = 0
 
 st.sidebar.markdown("---")
+
+# 암기 완료 리셋 관리 기능 추가
+st.sidebar.markdown("### 🎯 암기 상태 관리")
+memorized_cnt = len(st.session_state.memorized_words)
+st.sidebar.write(f"✅ 완료 처리된 단어: **{memorized_cnt}** 개")
+
+if st.sidebar.button("🔄 제외된 단어 모두 복원", use_container_width=True):
+    st.session_state.memorized_words.clear()
+    st.sidebar.success("모든 단어가 다시 학습 대상에 포함되었습니다!")
+    st.rerun()
+
+st.sidebar.markdown("---")
 st.sidebar.markdown("### ⚙️ 메뉴 이동")
 data_menu = st.sidebar.radio(
     "메뉴를 선택하세요:",
@@ -298,21 +314,22 @@ data_menu = st.sidebar.radio(
 )
 
 # ---------------------------------------------------------
-# 페이지 1: 회차별 전체 모아보기 (상단 제목 완전제거 & 가로 10열)
+# 페이지 1: 회차별 전체 모아보기 (암기 제외 기능 적용)
 # ---------------------------------------------------------
 if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
     if not st.session_state.cards_db:
         st.warning("등록된 단어가 없습니다.")
     else:
+        # 암기 완료 단어 제외 필터링
         if st.session_state.selected_round == "전체 보기":
-            target_cards = list(st.session_state.cards_db.values())
+            target_cards = [v for k, v in st.session_state.cards_db.items() if k not in st.session_state.memorized_words]
         else:
-            target_cards = [v for v in st.session_state.cards_db.values() if v["round"] == st.session_state.selected_round]
+            target_cards = [v for k, v in st.session_state.cards_db.items() if v["round"] == st.session_state.selected_round and k not in st.session_state.memorized_words]
 
         if len(target_cards) == 0:
-            st.warning("단어가 없습니다.")
+            st.balloons()
+            st.success("🎉 선택한 차수의 모든 단어를 암기 완료했습니다! (사이드바에서 '제외된 단어 모두 복원'을 누르면 다시 공부할 수 있습니다)")
         else:
-            # 가로 10열(Columns) 바둑판 배치
             cols_per_row = 10
             for i in range(0, len(target_cards), cols_per_row):
                 cols = st.columns(cols_per_row)
@@ -321,10 +338,15 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
                 for idx, card in enumerate(row_cards):
                     with cols[idx]:
                         c_html = generate_card_html(card, is_mini=True)
-                        components.html(c_html, height=105)
+                        components.html(c_html, height=100)
+                        
+                        # 카드 밑에 '암기 완료' 버튼 추가
+                        if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
+                            st.session_state.memorized_words.add(card['word'])
+                            st.rerun()
 
 # ---------------------------------------------------------
-# 페이지 2: 개별 플래시카드 학습
+# 페이지 2: 개별 플래시카드 학습 (암기 제외 기능 적용)
 # ---------------------------------------------------------
 elif data_menu == "🎴 개별 플래시카드 학습":
     st.title("🎴 개별 플래시카드 학습")
@@ -332,15 +354,17 @@ elif data_menu == "🎴 개별 플래시카드 학습":
     if not st.session_state.cards_db:
         st.warning("등록된 단어가 없습니다.")
     else:
+        # 암기 완료 단어 제외 필터링
         if st.session_state.selected_round == "전체 보기":
-            filtered_words = list(st.session_state.cards_db.keys())
+            filtered_words = [w for w in st.session_state.cards_db.keys() if w not in st.session_state.memorized_words]
         else:
-            filtered_words = [w for w, v in st.session_state.cards_db.items() if v["round"] == st.session_state.selected_round]
+            filtered_words = [w for w, v in st.session_state.cards_db.items() if v["round"] == st.session_state.selected_round and w not in st.session_state.memorized_words]
 
         total_words = len(filtered_words)
 
         if total_words == 0:
-            st.warning("선택한 차수에 단어가 없습니다.")
+            st.balloons()
+            st.success("🎉 선택한 차수의 모든 단어를 암기 완료했습니다!")
         else:
             if st.session_state.current_index >= total_words:
                 st.session_state.current_index = 0
@@ -353,13 +377,23 @@ elif data_menu == "🎴 개별 플래시카드 학습":
                 st.session_state.selected_word_key = chosen
                 st.session_state.current_index = filtered_words.index(chosen)
 
-            st.selectbox(
-                f"학습할 단어 선택 ({st.session_state.selected_round}):",
-                filtered_words,
-                index=st.session_state.current_index,
-                key="word_select_box",
-                on_change=on_word_change
-            )
+            col_select, col_mem = st.columns([3, 1])
+            with col_select:
+                st.selectbox(
+                    f"학습할 단어 선택 ({st.session_state.selected_round} - 남은 단어: {total_words}개):",
+                    filtered_words,
+                    index=st.session_state.current_index,
+                    key="word_select_box",
+                    on_change=on_word_change
+                )
+            with col_mem:
+                st.write("") # 간격 조정
+                st.write("")
+                if st.button("이 단어 암기 완료 ✅", use_container_width=True):
+                    st.session_state.memorized_words.add(st.session_state.selected_word_key)
+                    if st.session_state.current_index >= len(filtered_words) - 1:
+                        st.session_state.current_index = 0
+                    st.rerun()
 
             col1, col2 = st.columns([1, 1])
             with col1:
@@ -375,7 +409,7 @@ elif data_menu == "🎴 개별 플래시카드 학습":
 
             card = st.session_state.cards_db[st.session_state.selected_word_key]
             card_html = generate_card_html(card, is_mini=False)
-            components.html(card_html, height=350)
+            components.html(card_html, height=310)
 
 # ---------------------------------------------------------
 # 페이지 3: 원본 데이터
