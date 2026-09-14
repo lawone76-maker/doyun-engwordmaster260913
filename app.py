@@ -8,9 +8,9 @@ st.set_page_config(page_title="도윤 영어단어 암기장", layout="wide")
 
 st.markdown("""
     <style>
-        /* 상단 헤더 숨기기 */
+        /* 상단 배경만 투명하게 처리하고 사이드바 버튼은 유지 */
         header[data-testid="stHeader"] {
-            display: none !important;
+            background-color: transparent !important;
         }
         .block-container {
             padding-top: 1rem !important;
