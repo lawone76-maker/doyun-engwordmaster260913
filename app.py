@@ -349,7 +349,7 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
 # 페이지 2: 개별 플래시카드 학습 (암기 제외 기능 적용)
 # ---------------------------------------------------------
 elif data_menu == "🎴 개별 플래시카드 학습":
-    st.title("🎴 개별 플래시카드 학습")
+    st.markdown("<h3 style='font-size: 1.3rem; margin-top: -10px; margin-bottom: 10px;'>🎴 개별 플래시카드 학습</h3>", unsafe_allow_html=True)
     
     if not st.session_state.cards_db:
         st.warning("등록된 단어가 없습니다.")
