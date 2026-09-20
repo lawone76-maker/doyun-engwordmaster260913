@@ -134,31 +134,31 @@ def generate_card_html(card, is_mini=False):
         <html>
         <head>
         <style>
-            body {
+            body {{
                 margin: 0;
                 padding: 0;
                 background-color: transparent;
                 font-family: system-ui, -apple-system, sans-serif;
-            }
-            .flip-card {
+            }}
+            .flip-card {{
                 background-color: transparent;
                 width: 100%;
                 height: 125px;
                 perspective: 600px;
                 cursor: pointer;
-            }
-            .flip-card-inner {
+            }}
+            .flip-card-inner {{
                 position: relative;
                 width: 100%;
                 height: 100%;
                 text-align: center;
                 transition: transform 0.6s;
                 transform-style: preserve-3d;
-            }
-            .flip-card.flipped .flip-card-inner {
+            }}
+            .flip-card.flipped .flip-card-inner {{
                 transform: rotateY(180deg);
-            }
-            .flip-card-front, .flip-card-back {
+            }}
+            .flip-card-front, .flip-card-back {{
                 position: absolute;
                 width: 100%;
                 height: 100%;
@@ -172,62 +172,62 @@ def generate_card_html(card, is_mini=False):
                 padding: 8px;
                 box-sizing: border-box;
                 box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            }
+            }}
 
             /* ☀️ 라이트모드 기본 스타일 */
-            .flip-card-front {
+            .flip-card-front {{
                 background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
                 border: 2px solid #cbd5e1;
                 color: #0f172a;
-            }
-            .flip-card-back {
+            }}
+            .flip-card-back {{
                 background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
                 border: 2px solid #38bdf8;
                 color: #0369a1;
                 transform: rotateY(180deg);
-            }
-            .card-meta {
+            }}
+            .card-meta {{
                 font-size: 0.75rem;
                 font-weight: 600;
                 color: #64748b;
                 margin-bottom: 4px;
-            }
-            .word-en {
+            }}
+            .word-en {{
                 font-size: 1.35rem;
                 font-weight: 800;
                 word-break: break-word;
-            }
-            .word-kr {
+            }}
+            .word-kr {{
                 font-size: 1.15rem;
                 font-weight: 700;
                 word-break: break-word;
-            }
-            .click-hint {
+            }}
+            .click-hint {{
                 font-size: 0.65rem;
                 color: #94a3b8;
                 margin-top: 4px;
-            }
+            }}
 
             /* 🌙 다크모드 전용 반응형 스타일 */
-            @media (prefers-color-scheme: dark) {
-                .flip-card-front {
+            @media (prefers-color-scheme: dark) {{
+                .flip-card-front {{
                     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
                     border: 2px solid #334155;
                     color: #f8fafc;
-                }
-                .flip-card-back {
+                }}
+                .flip-card-back {{
                     background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%);
                     border: 2px solid #0284c7;
                     color: #e0f2fe;
                     transform: rotateY(180deg);
-                }
-                .card-meta {
+                }}
+                .card-meta {{
                     color: #94a3b8;
-                }
-                .click-hint {
+                }}
+                .click-hint {{
                     color: #64748b;
-                }
-            }
+                }}
+            }}
         </style>
         </head>
         <body>
