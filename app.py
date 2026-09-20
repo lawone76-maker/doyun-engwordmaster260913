@@ -437,7 +437,7 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (5열)":
                 for idx, card in enumerate(row_cards):
                     with cols[idx]:
                         c_html = generate_card_html(card, is_mini=True)
-                        components.html(c_html, height=120)
+                        components.html(c_html, height=130)
                         
                         # 카드 바로 밑에 완료 버튼 배치
                         if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
