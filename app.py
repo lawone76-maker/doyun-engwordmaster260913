@@ -171,13 +171,13 @@ def generate_card_html(card, is_mini=False):
                 justify-content: center;
                 padding: 8px;
                 box-sizing: border-box;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
             }}
 
-            /* ☀️ 라이트모드 기본 스타일 */
+            /* 깔끔하고 밝은 카드 디자인 (고정) */
             .flip-card-front {{
-                background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-                border: 2px solid #cbd5e1;
+                background: #ffffff;
+                border: 2px solid #e2e8f0;
                 color: #0f172a;
             }}
             .flip-card-back {{
@@ -195,38 +195,19 @@ def generate_card_html(card, is_mini=False):
             .word-en {{
                 font-size: 1.35rem;
                 font-weight: 800;
+                color: #0f172a;
                 word-break: break-word;
             }}
             .word-kr {{
                 font-size: 1.15rem;
                 font-weight: 700;
+                color: #0369a1;
                 word-break: break-word;
             }}
             .click-hint {{
                 font-size: 0.65rem;
                 color: #94a3b8;
                 margin-top: 4px;
-            }}
-
-            /* 🌙 다크모드 전용 반응형 스타일 */
-            @media (prefers-color-scheme: dark) {{
-                .flip-card-front {{
-                    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-                    border: 2px solid #334155;
-                    color: #f8fafc;
-                }}
-                .flip-card-back {{
-                    background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 100%);
-                    border: 2px solid #0284c7;
-                    color: #e0f2fe;
-                    transform: rotateY(180deg);
-                }}
-                .card-meta {{
-                    color: #94a3b8;
-                }}
-                .click-hint {{
-                    color: #64748b;
-                }}
             }}
         </style>
         </head>
