@@ -215,9 +215,9 @@ def generate_card_html(card, is_mini=False):
             <div class="flip-card" onclick="this.classList.toggle('flipped')">
                 <div class="flip-card-inner">
                     <div class="flip-card-front">
-                        <div class="card-meta">#{card.get('id', '')} | {card.get('round', '')}차</div>
+                        <div class="card-meta">#{card.get('id', '')} | {card.get('round', '')}</div>
                         <div class="word-en">{card.get('word', '')}</div>
-                        <div class="click-hint">click 🔍</div>
+                        <div class="click-hint">확인 🔍</div>
                     </div>
                     <div class="flip-card-back">
                         <div class="word-kr">{card.get('meaning', '')}</div>
