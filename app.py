@@ -134,84 +134,92 @@ def generate_card_html(card, is_mini=False):
         <html>
         <head>
         <style>
-        body {{
-            margin: 0;
-            padding: 0;
-            background-color: transparent;
-            font-family: system-ui, -apple-system, sans-serif;
-        }}
-        .flip-card {{
-            background-color: transparent;
-            width: 100%;
-            height: 95px;
-            perspective: 600px;
-            cursor: pointer;
-        }}
-        .flip-card-inner {{
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.4s ease;
-            transform-style: preserve-3d;
-        }}
-        .flip-card.flipped .flip-card-inner {{
-            transform: rotateY(180deg);
-        }}
-        .flip-card-front, .flip-card-back {{
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            border-radius: 6px;
-            padding: 5px 6px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }}
-        .flip-card-front {{
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border: 1px solid #3b82f6;
-            color: #ffffff;
-        }}
-        .flip-card-back {{
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            border: 1px solid #818cf8;
-            color: #ffffff;
-            transform: rotateY(180deg);
-        }}
+            body {{
+                margin: 0;
+                padding: 0;
+                background-color: transparent;
+                font-family: system-ui, -apple-system, sans-serif;
+            }}
+            .flip-card {{
+                background-color: transparent;
+                width: 100%;
+                height: 125px;
+                perspective: 600px;
+                cursor: pointer;
+            }}
+            .flip-card-inner {{
+                position: relative;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+                transition: transform 0.6s;
+                transform-style: preserve-3d;
+            }}
+            .flip-card.flipped .flip-card-inner {{
+                transform: rotateY(180deg);
+            }}
+            .flip-card-front, .flip-card-back {{
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+                border-radius: 12px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 8px;
+                box-sizing: border-box;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+            }}
+            .flip-card-front {{
+                background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+                border: 2px solid #cbd5e1;
+                color: #0f172a;
+            }}
+            .flip-card-back {{
+                background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+                border: 2px solid #38bdf8;
+                color: #0369a1;
+                transform: rotateY(180deg);
+            }}
+            .card-meta {{
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #64748b;
+                margin-bottom: 4px;
+            }}
+            .word-en {{
+                font-size: 1.35rem;
+                font-weight: 800;
+                word-break: break-word;
+            }}
+            .word-kr {{
+                font-size: 1.15rem;
+                font-weight: 700;
+                word-break: break-word;
+            }}
+            .click-hint {{
+                font-size: 0.65rem;
+                color: #94a3b8;
+                margin-top: 4px;
+            }}
         </style>
         </head>
         <body>
-        <div class="flip-card" id="card_{card['id']}">
-            <div class="flip-card-inner">
-                <div class="flip-card-front">
-                    <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
-                        <span>#{card['id']}</span>
-                        <span style="color: #93c5fd;">{card['round']}</span>
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="card-meta">#{card.get('id', '')} | {card.get('round', '')}차</div>
+                        <div class="word-en">{card.get('word', '')}</div>
+                        <div class="click-hint">click 🔍</div>
                     </div>
-                    <div style="text-align: center; margin: auto 0;">
-                        <div style="font-size: 13px; font-weight: 700; color: #60a5fa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['word']}</div>
+                    <div class="flip-card-back">
+                        <div class="word-kr">{card.get('meaning', '')}</div>
                     </div>
-                    <div style="font-size: 7px; color: #475569; text-align: right;">click 🔄</div>
-                </div>
-                <div class="flip-card-back">
-                    <div style="font-size: 9px; color: #a5b4fc; font-weight: bold; border-bottom: 1px solid #312e81; padding-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['word']}</div>
-                    <div style="margin: auto 0; overflow: hidden;">
-                        <div style="font-size: 10px; font-weight: 700; color: #38bdf8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['meaning']}</div>
-                        <div style="font-size: 8px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['synonym']}</div>
-                    </div>
-                    <div style="font-size: 7px; color: #475569; text-align: right;">back ↩</div>
                 </div>
             </div>
-        </div>
-        <script>
-            document.getElementById('card_{card['id']}').addEventListener('click', function() {{
-                this.classList.toggle('flipped');
-            }});
-        </script>
         </body>
         </html>
         """
@@ -362,14 +370,14 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("### ⚙️ 메뉴 이동")
 data_menu = st.sidebar.radio(
     "메뉴를 선택하세요:",
-    ["🖼️ 회차별 전체 모아보기 (10열)", "🎴 개별 플래시카드 학습", "📄 원본 데이터", "📁 데이터 업로드"],
+    ["🖼️ 회차별 전체 모아보기 (5열)", "🎴 개별 플래시카드 학습", "📄 원본 데이터", "📁 데이터 업로드"],
     index=0
 )
 
 # ---------------------------------------------------------
 # 페이지 1: 회차별 전체 모아보기 (암기 제외 기능 적용)
 # ---------------------------------------------------------
-if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
+if data_menu == "🖼️ 회차별 전체 모아보기 (5열)":
     if not st.session_state.cards_db:
         st.warning("등록된 단어가 없습니다.")
     else:
@@ -383,7 +391,7 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
             st.balloons()
             st.success("🎉 선택한 차수의 모든 단어를 암기 완료했습니다! (사이드바에서 '제외된 단어 모두 복원'을 누르면 다시 공부할 수 있습니다)")
         else:
-            cols_per_row = 10
+            cols_per_row = 5
             for i in range(0, len(target_cards), cols_per_row):
                 cols = st.columns(cols_per_row)
                 row_cards = target_cards[i:i+cols_per_row]
@@ -391,7 +399,7 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
                 for idx, card in enumerate(row_cards):
                     with cols[idx]:
                         c_html = generate_card_html(card, is_mini=True)
-                        components.html(c_html, height=100)
+                        components.html(c_html, height=130)
                         
                         # 카드 밑에 '암기 완료' 버튼 추가
                         if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
