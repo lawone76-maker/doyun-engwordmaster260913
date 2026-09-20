@@ -7,6 +7,15 @@ from supabase import create_client, Client
 # 1. 페이지 기본 설정 (상단 여백 완전 제거 CSS 및 버튼 스타일 적용)
 st.set_page_config(page_title="도윤 영어단어 암기장", layout="wide")
 
+# 버튼 및 카드 간격 조정 CSS 추가
+st.markdown("""
+<style>
+    iframe[title="st.components.v1.html"] {
+        margin-bottom: -15px !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # ==========================================
 # 여기(8행 이후)에 Supabase 설정 및 사용자 관리 코드를 넣으시면 됩니다!
 # ==========================================
@@ -399,17 +408,19 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (5열)":
             for i in range(0, len(target_cards), cols_per_row):
                 cols = st.columns(cols_per_row)
                 row_cards = target_cards[i:i+cols_per_row]
-                
                 for idx, card in enumerate(row_cards):
                     with cols[idx]:
                         c_html = generate_card_html(card, is_mini=True)
                         components.html(c_html, height=130)
                         
-                        # 카드 밑에 '암기 완료' 버튼 추가
+                        # 카드 바로 밑에 완료 버튼 배치
                         if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
                             st.session_state.memorized_words.add(card['word'])
                             save_user_progress()
                             st.rerun()
+
+            # ★ 행 한 줄이 끝날 때마다 아래쪽에 여백을 추가하여 완료 버튼이 위쪽 카드에 붙어 보이게 설정 ★
+            st.markdown("<div style='margin-bottom: 25px;'></div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # 페이지 2: 개별 플래시카드 학습 (암기 제외 기능 적용)
