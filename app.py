@@ -8,21 +8,17 @@ from supabase import create_client, Client
 st.set_page_config(page_title="도윤 영어단어 암기장", layout="wide")
 
 # 카드와 버튼 밀착 및 행 간격 조정을 위한 CSS
+
 st.markdown("""
 <style>
-    /* iframe 하단 여백 제거 */
+    /* 카드 iframe 하단 여백 제거 */
     iframe[title="st.components.v1.html"] {
-        margin-bottom: -12px !important;
+        margin-bottom: -8px !important;
     }
     
-    /* Streamlit 요소 간 기본 세로 간격 조정 */
-    [data-testid="stVerticalBlock"] > div {
-        gap: 0rem !important;
-    }
-    
-    /* 버튼을 카드 아래쪽에 짤림 없이 밀착 */
-    div[st-element="button"] button, div.stButton > button {
-        margin-top: -5px !important;
+    /* 완료 버튼 위치 살짝 상단으로 댕기기 */
+    div.stButton > button {
+        margin-top: -2px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -441,7 +437,7 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (5열)":
                 for idx, card in enumerate(row_cards):
                     with cols[idx]:
                         c_html = generate_card_html(card, is_mini=True)
-                        components.html(c_html, height=10)
+                        components.html(c_html, height=140)
                         
                         # 카드 바로 밑에 완료 버튼 배치
                         if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
