@@ -7,11 +7,22 @@ from supabase import create_client, Client
 # 1. 페이지 기본 설정 (상단 여백 완전 제거 CSS 및 버튼 스타일 적용)
 st.set_page_config(page_title="도윤 영어단어 암기장", layout="wide")
 
-# 버튼 및 카드 간격 조정 CSS 추가
+# 카드와 버튼 밀착 및 행 간격 조정을 위한 CSS
 st.markdown("""
 <style>
+    /* iframe 자체의 하단 기본 여백 제거 및 당기기 */
     iframe[title="st.components.v1.html"] {
-        margin-bottom: -15px !important;
+        margin-bottom: -20px !important;
+    }
+    
+    /* Streamlit 요소 간 기본 세로 간격 최소화 */
+    [data-testid="stVerticalBlock"] > div {
+        gap: 0.2rem !important;
+    }
+    
+    /* 완료 버튼을 위쪽 카드에 더 바짝 밀착 */
+    div[st-element="button"] button, div.stButton > button {
+        margin-top: -10px !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -411,7 +422,7 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (5열)":
                 for idx, card in enumerate(row_cards):
                     with cols[idx]:
                         c_html = generate_card_html(card, is_mini=True)
-                        components.html(c_html, height=130)
+                        components.html(c_html, height=120)
                         
                         # 카드 바로 밑에 완료 버튼 배치
                         if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
