@@ -7,22 +7,6 @@ from supabase import create_client, Client
 # 1. 페이지 기본 설정 (상단 여백 완전 제거 CSS 및 버튼 스타일 적용)
 st.set_page_config(page_title="도윤 영어단어 암기장", layout="wide")
 
-# 카드와 버튼 밀착 및 행 간격 조정을 위한 CSS
-
-st.markdown("""
-<style>
-    /* 카드 iframe 하단 여백 제거 */
-    iframe[title="st.components.v1.html"] {
-        margin-bottom: -8px !important;
-    }
-    
-    /* 완료 버튼 위치 살짝 상단으로 댕기기 */
-    div.stButton > button {
-        margin-top: -2px !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # ==========================================
 # 여기(8행 이후)에 Supabase 설정 및 사용자 관리 코드를 넣으시면 됩니다!
 # ==========================================
@@ -150,218 +134,187 @@ def generate_card_html(card, is_mini=False):
         <html>
         <head>
         <style>
-            body {{
-                margin: 0;
-                padding: 0;
-                background-color: transparent;
-                font-family: system-ui, -apple-system, sans-serif;
-            }}
-            .flip-card {{
-                background-color: transparent;
-                width: 100%;
-                height: 125px;
-                perspective: 600px;
-                cursor: pointer;
-            }}
-            .flip-card-inner {{
-                position: relative;
-                width: 100%;
-                height: 100%;
-                text-align: center;
-                transition: transform 0.6s;
-                transform-style: preserve-3d;
-            }}
-            .flip-card.flipped .flip-card-inner {{
-                transform: rotateY(180deg);
-            }}
-            .flip-card-front, .flip-card-back {{
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                -webkit-backface-visibility: hidden;
-                backface-visibility: hidden;
-                border-radius: 12px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                padding: 8px;
-                box-sizing: border-box;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-            }}
-
-            /* 깔끔하고 밝은 카드 디자인 (고정) */
-            .flip-card-front {{
-                background: #ffffff;
-                border: 2px solid #e2e8f0;
-                color: #0f172a;
-            }}
-            .flip-card-back {{
-                background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-                border: 2px solid #38bdf8;
-                color: #0369a1;
-                transform: rotateY(180deg);
-            }}
-            .card-meta {{
-                font-size: 0.75rem;
-                font-weight: 600;
-                color: #64748b;
-                margin-bottom: 4px;
-            }}
-            .word-en {{
-                font-size: 1.35rem;
-                font-weight: 800;
-                color: #0f172a;
-                word-break: break-word;
-            }}
-            .word-kr {{
-                font-size: 1.15rem;
-                font-weight: 700;
-                color: #0369a1;
-                word-break: break-word;
-            }}
-            .click-hint {{
-                font-size: 0.65rem;
-                color: #94a3b8;
-                margin-top: 4px;
-            }}
+        body {{
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+            font-family: system-ui, -apple-system, sans-serif;
+        }}
+        .flip-card {{
+            background-color: transparent;
+            width: 100%;
+            height: 95px;
+            perspective: 600px;
+            cursor: pointer;
+        }}
+        .flip-card-inner {{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.4s ease;
+            transform-style: preserve-3d;
+        }}
+        .flip-card.flipped .flip-card-inner {{
+            transform: rotateY(180deg);
+        }}
+        .flip-card-front, .flip-card-back {{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 6px;
+            padding: 5px 6px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }}
+        .flip-card-front {{
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #3b82f6;
+            color: #ffffff;
+        }}
+        .flip-card-back {{
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border: 1px solid #818cf8;
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }}
         </style>
         </head>
         <body>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
-                <div class="flip-card-inner">
-                    <div class="flip-card-front">
-                        <div class="card-meta">#{card.get('id', '')} | {card.get('round', '')}</div>
-                        <div class="word-en">{card.get('word', '')}</div>
-                        <div class="click-hint">확인 🔍</div>
+        <div class="flip-card" id="card_{card['id']}">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <div style="display: flex; justify-content: space-between; font-size: 9px; color: #94a3b8;">
+                        <span>#{card['id']}</span>
+                        <span style="color: #93c5fd;">{card['round']}</span>
                     </div>
-                    <div class="flip-card-back">
-                        <div class="word-kr">{card.get('meaning', '')}</div>
+                    <div style="text-align: center; margin: auto 0;">
+                        <div style="font-size: 13px; font-weight: 700; color: #60a5fa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['word']}</div>
                     </div>
+                    <div style="font-size: 7px; color: #475569; text-align: right;">click 🔄</div>
+                </div>
+                <div class="flip-card-back">
+                    <div style="font-size: 9px; color: #a5b4fc; font-weight: bold; border-bottom: 1px solid #312e81; padding-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['word']}</div>
+                    <div style="margin: auto 0; overflow: hidden;">
+                        <div style="font-size: 10px; font-weight: 700; color: #38bdf8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['meaning']}</div>
+                        <div style="font-size: 8px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{card['synonym']}</div>
+                    </div>
+                    <div style="font-size: 7px; color: #475569; text-align: right;">back ↩</div>
                 </div>
             </div>
+        </div>
+        <script>
+            document.getElementById('card_{card['id']}').addEventListener('click', function() {{
+                this.classList.toggle('flipped');
+            }});
+        </script>
         </body>
         </html>
         """
     else:
-        # 개별 플래시카드 학습용 (큰 카드) - 화사한 라이트 스타일
         return f"""
         <!DOCTYPE html>
         <html>
         <head>
         <style>
-            body {{
-                margin: 0;
-                padding: 0;
-                background-color: transparent;
-                font-family: system-ui, -apple-system, sans-serif;
-            }}
-            .flip-card {{
-                background-color: transparent;
-                width: 100%;
-                height: 380px;
-                perspective: 1000px;
-                cursor: pointer;
-            }}
-            .flip-card-inner {{
-                position: relative;
-                width: 100%;
-                height: 100%;
-                text-align: center;
-                transition: transform 0.6s;
-                transform-style: preserve-3d;
-            }}
-            .flip-card.flipped .flip-card-inner {{
-                transform: rotateY(180deg);
-            }}
-            .flip-card-front, .flip-card-back {{
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                -webkit-backface-visibility: hidden;
-                backface-visibility: hidden;
-                border-radius: 20px;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                padding: 24px;
-                box-sizing: border-box;
-                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-            }}
-            .flip-card-front {{
-                background: #ffffff;
-                border: 2px solid #e2e8f0;
-                color: #0f172a;
-            }}
-            .flip-card-back {{
-                background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-                border: 2px solid #38bdf8;
-                color: #0369a1;
-                transform: rotateY(180deg);
-            }}
-            .card-header {{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-size: 0.95rem;
-                font-weight: 600;
-                color: #64748b;
-            }}
-            .round-badge {{
-                background-color: #e2e8f0;
-                color: #334155;
-                padding: 4px 10px;
-                border-radius: 12px;
-                font-size: 0.85rem;
-            }}
-            .word-en {{
-                font-size: 2.8rem;
-                font-weight: 800;
-                color: #0f172a;
-                word-break: break-word;
-            }}
-            .word-kr {{
-                font-size: 2.2rem;
-                font-weight: 700;
-                color: #0369a1;
-                word-break: break-word;
-            }}
-            .card-footer {{
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                font-size: 0.85rem;
-                color: #94a3b8;
-            }}
+        body {{
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, -apple-system, sans-serif;
+        }}
+        .flip-card {{
+            background-color: transparent;
+            width: 560px;
+            height: 300px;
+            perspective: 1000px;
+            cursor: pointer;
+        }}
+        .flip-card-inner {{
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }}
+        .flip-card.flipped .flip-card-inner {{
+            transform: rotateY(180deg);
+        }}
+        .flip-card-front, .flip-card-back {{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 18px;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }}
+        .flip-card-front {{
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #3b82f6;
+            color: #ffffff;
+        }}
+        .flip-card-back {{
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            border: 2px solid #818cf8;
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }}
         </style>
         </head>
         <body>
-            <div class="flip-card" onclick="this.classList.toggle('flipped')">
-                <div class="flip-card-inner">
-                    <div class="flip-card-front">
-                        <div class="card-header">
-                            <span>ID: {card.get('id', '')}</span>
-                            <span class="round-badge">{card.get('round', '')}</span>
-                        </div>
-                        <div class="word-en">{card.get('word', '')}</div>
-                        <div class="card-footer">
-                            <span>👆 카드를 클릭하면 뒤집힙니다</span>
-                            <span>단어 카드</span>
+        <div class="flip-card" id="card_{card['id']}">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; color: #94a3b8; border-bottom: 1px solid #334155; padding-bottom: 8px;">
+                        <span>ID: {card['id']}</span>
+                        <span style="background: #1e3a8a; padding: 2px 8px; border-radius: 6px; color: #93c5fd;">{card['round']}</span>
+                    </div>
+                    <div style="text-align: center; margin: auto 0;">
+                        <div style="font-size: 44px; font-weight: 800; color: #60a5fa; letter-spacing: 0.5px;">{card['word']}</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b;">
+                        <span>👆 카드를 클릭하면 뒤집힙니다</span>
+                        <span>단어 카드</span>
+                    </div>
+                </div>
+                <div class="flip-card-back">
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; color: #a5b4fc; border-bottom: 1px solid #312e81; padding-bottom: 8px;">
+                        <span>ID: {card['id']} | <strong>{card['word']}</strong></span>
+                        <span style="background: #312e81; padding: 2px 8px; border-radius: 6px; color: #c7d2fe;">{card['round']}</span>
+                    </div>
+                    <div style="margin: auto 0; overflow-y: auto;">
+                        <div style="font-size: 24px; font-weight: 700; color: #38bdf8; margin-bottom: 8px;">📌 {card['meaning']}</div>
+                        <div style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px; background: rgba(255,255,255,0.1); display: inline-block; padding: 4px 10px; border-radius: 6px;">🔗 동의어: {card['synonym']}</div>
+                        <div style="margin-top: 6px; background: rgba(0,0,0,0.25); padding: 10px; border-radius: 8px;">
+                            <div style="font-size: 14px; color: #f1f5f9; line-height: 1.4;">🗣️ {card['example_en']}</div>
+                            <div style="font-size: 13px; color: #94a3b8; margin-top: 4px;">💬 {card['example_kr']}</div>
                         </div>
                     </div>
-                    <div class="flip-card-back">
-                        <div class="card-header">
-                            <span>ID: {card.get('id', '')}</span>
-                            <span class="round-badge">{card.get('round', '')}</span>
-                        </div>
-                        <div class="word-kr">{card.get('meaning', '')}</div>
-                        <div class="card-footer">
-                            <span>👆 카드를 클릭하면 뒤집힙니다</span>
-                            <span>뜻 카드</span>
-                        </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #64748b;">
+                        <span>👆 다시 클릭하면 앞면으로 뒤집힙니다</span>
+                        <span>뜻 및 예문</span>
                     </div>
                 </div>
             </div>
+        </div>
+        <script>
+            document.getElementById('card_{card['id']}').addEventListener('click', function() {{
+                this.classList.toggle('flipped');
+            }});
+        </script>
         </body>
         </html>
         """
@@ -409,14 +362,14 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("### ⚙️ 메뉴 이동")
 data_menu = st.sidebar.radio(
     "메뉴를 선택하세요:",
-    ["🖼️ 회차별 전체 모아보기 (5열)", "🎴 개별 플래시카드 학습", "📄 원본 데이터", "📁 데이터 업로드"],
+    ["🖼️ 회차별 전체 모아보기 (10열)", "🎴 개별 플래시카드 학습", "📄 원본 데이터", "📁 데이터 업로드"],
     index=0
 )
 
 # ---------------------------------------------------------
 # 페이지 1: 회차별 전체 모아보기 (암기 제외 기능 적용)
 # ---------------------------------------------------------
-if data_menu == "🖼️ 회차별 전체 모아보기 (5열)":
+if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
     if not st.session_state.cards_db:
         st.warning("등록된 단어가 없습니다.")
     else:
@@ -434,19 +387,17 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (5열)":
             for i in range(0, len(target_cards), cols_per_row):
                 cols = st.columns(cols_per_row)
                 row_cards = target_cards[i:i+cols_per_row]
+                
                 for idx, card in enumerate(row_cards):
                     with cols[idx]:
                         c_html = generate_card_html(card, is_mini=True)
                         components.html(c_html, height=130)
                         
-                        # 카드 바로 밑에 완료 버튼 배치
+                        # 카드 밑에 '암기 완료' 버튼 추가
                         if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
                             st.session_state.memorized_words.add(card['word'])
                             save_user_progress()
                             st.rerun()
-
-            # ★ 행 한 줄이 끝날 때마다 아래쪽에 여백을 추가하여 완료 버튼이 위쪽 카드에 붙어 보이게 설정 ★
-            st.markdown("<div style='margin-bottom: 25px;'></div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # 페이지 2: 개별 플래시카드 학습 (암기 제외 기능 적용)
