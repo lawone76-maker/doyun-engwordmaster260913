@@ -2,9 +2,61 @@ import os
 import streamlit as st
 import streamlit.components.v1 as components
 import pandas as pd
+from supabase import create_client, Client
 
 # 1. 페이지 기본 설정 (상단 여백 완전 제거 CSS 및 버튼 스타일 적용)
 st.set_page_config(page_title="도윤 영어단어 암기장", layout="wide")
+
+# ==========================================
+# 여기(8행 이후)에 Supabase 설정 및 사용자 관리 코드를 넣으시면 됩니다!
+# ==========================================
+SUPABASE_URL = "https://vstetskytidhvqeyxyyi.supabase.co"
+SUPABASE_KEY = "sb_publishable_WwjtW2g3-5dHGKOAbXbBNw_2dL5ZU-G"
+
+@st.cache_resource
+def init_supabase() -> Client:
+    return create_client(SUPABASE_URL, SUPABASE_KEY)
+
+supabase = init_supabase()
+
+st.sidebar.title("👤 사용자 관리")
+user_input_id = st.sidebar.text_input(
+    "사용자 ID (닉네임)", 
+    value="default_user", 
+    help="본인 ID를 입력하고 Enter를 누르면 내 개별 학습 데이터를 불러옵니다."
+)
+
+if "current_user_id" not in st.session_state or st.session_state.current_user_id != user_input_id:
+    st.session_state.current_user_id = user_input_id
+    st.session_state.db_loaded = False
+
+user_id = st.session_state.current_user_id
+
+if not st.session_state.get("db_loaded", False):
+    try:
+        res = supabase.table("english_user_progress").select("*").eq("user_id", user_id).execute()
+        if res.data:
+            st.session_state.memorized_words = set(res.data[0].get("memorized_words", []))
+        else:
+            st.session_state.memorized_words = set()
+            supabase.table("english_user_progress").upsert({
+                "user_id": user_id,
+                "memorized_words": list(st.session_state.memorized_words)
+            }).execute()
+    except Exception as e:
+        if "memorized_words" not in st.session_state:
+            st.session_state.memorized_words = set()
+    st.session_state.db_loaded = True
+
+def save_user_progress():
+    try:
+        supabase.table("english_user_progress").upsert({
+            "user_id": user_id,
+            "memorized_words": list(st.session_state.memorized_words)
+        }).execute()
+    except Exception as e:
+        pass
+# ==========================================
 
 st.markdown("""
     <style>
@@ -302,6 +354,7 @@ st.sidebar.write(f"✅ 완료 처리된 단어: **{memorized_cnt}** 개")
 
 if st.sidebar.button("🔄 제외된 단어 모두 복원", use_container_width=True):
     st.session_state.memorized_words.clear()
+    save_user_progress()  # <--- 이 줄을 추가해 주세요!
     st.sidebar.success("모든 단어가 다시 학습 대상에 포함되었습니다!")
     st.rerun()
 
@@ -343,6 +396,7 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
                         # 카드 밑에 '암기 완료' 버튼 추가
                         if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
                             st.session_state.memorized_words.add(card['word'])
+                            save_user_progress()
                             st.rerun()
 
 # ---------------------------------------------------------
@@ -391,6 +445,7 @@ elif data_menu == "🎴 개별 플래시카드 학습":
                 st.write("")
                 if st.button("이 단어 암기 완료 ✅", use_container_width=True):
                     st.session_state.memorized_words.add(st.session_state.selected_word_key)
+                    save_user_progress()
                     if st.session_state.current_index >= len(filtered_words) - 1:
                         st.session_state.current_index = 0
                     st.rerun()
