@@ -70,12 +70,14 @@ st.markdown("""
             padding-left: 1rem !important;
             padding-right: 1rem !important;
         }
+        /* 카드 프레임(iframe) 바로 뒤에 오는 간격 축소 */
         iframe {
-            margin-bottom: -5px !important;
+            margin-bottom: -18px !important;
         }
-        /* 암기 완료 버튼 커스텀 스타일 */
-        .stButton>button {
+        /* 암기 완료 버튼을 위쪽 카드 쪽으로 상단 이동 */
+        div.stButton > button {
             border-radius: 8px;
+            margin-top: -6px !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -391,13 +393,16 @@ if data_menu == "🖼️ 회차별 전체 모아보기 (10열)":
                 for idx, card in enumerate(row_cards):
                     with cols[idx]:
                         c_html = generate_card_html(card, is_mini=True)
-                        components.html(c_html, height=130)
+                        components.html(c_html, height=110) # <--- height를 110으로 조정
                         
                         # 카드 밑에 '암기 완료' 버튼 추가
                         if st.button("완료 ✅", key=f"btn_m_{card['word']}", use_container_width=True):
                             st.session_state.memorized_words.add(card['word'])
                             save_user_progress()
                             st.rerun()
+
+                # 위쪽 행(카드+버튼 세트)과 아래쪽 다음 행 카드 간의 간격을 확실히 확보
+                st.markdown("<div style='margin-bottom: 28px;'></div>", unsafe_allow_html=True)
 
 # ---------------------------------------------------------
 # 페이지 2: 개별 플래시카드 학습 (암기 제외 기능 적용)
